@@ -1,0 +1,7 @@
+{
+    "explorer.excludeGitIgnore": false,
+    "rest-client.environmentVariables": {
+        
+        "$shared": {}
+    }
+}
