@@ -8,11 +8,11 @@ function App() {
   const [editingJob, setEditingJob] = useState(null);
   const [formData, setFormData] = useState({ title: "", company: "", status: "" });
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
+  console.log("This is the backendURL " + backendUrl);
   useEffect(() => {
     // Fetch jobs from the backend
     axios
-      .get(`${backendUrl}/jobs`) // Replace with your actual backend URL
+      .get(`${backendUrl}`) // Replace with your actual backend URL
       .then((response) => setJobs(response.data))
       .catch((error) => console.error("Error fetching jobs:", error));
   }, [backendUrl]);
@@ -24,7 +24,7 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("https://job-tracker-cy5a.onrender.com/jobs", newJob) // Send new job to backend
+      .post(backendUrl, newJob) // Send new job to backend
       .then((response) => {
         setJobs([...jobs, response.data]); // Update UI with new job
         setNewJob({ title: "", company: "", status: "applied" }); // Clear form
@@ -33,12 +33,19 @@ function App() {
   };
 
   const handleDelete = (id) => {
-    axios
-      .delete(`https://job-tracker-cy5a.onrender.com/jobs/${id}`)
-      .then(() => {
-        setJobs(jobs.filter((job) => job.id !== id)); // Remove the deleted job from UI
-      })
-      .catch((error) => console.error("Error deleting job:", error));
+    // Show a confirmation dialog
+    const confirmDeletion = window.confirm("Are you sure you want to delete this job?");
+    
+    if (confirmDeletion) {
+      // If the user confirms, proceed with deletion
+      axios
+        .delete(`${backendUrl}${id}`)
+        .then(() => {
+          // Update the UI by filtering out the deleted job
+          setJobs(jobs.filter((job) => job.id !== id));
+        })
+        .catch((error) => console.error("Error deleting job:", error));
+    }
   };
   const handleEdit = (job) => {
     setEditingJob(job.id); // Store the job ID being edited
@@ -46,7 +53,7 @@ function App() {
   };
   const handleUpdate = () => {
     axios
-      .put(`https://job-tracker-cy5a.onrender.com/jobs/${editingJob}`, formData)
+      .put(`${backendUrl}${editingJob}`, formData)
       .then((response) => {
         setJobs(jobs.map((job) => (job.id === editingJob ? response.data : job))); // Update UI
         setEditingJob(null); // Exit edit mode
