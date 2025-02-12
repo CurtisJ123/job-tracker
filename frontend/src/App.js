@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import jwtDecode from "jwt-decode"; // Import jwt-decode library
-import Login from "./login";
-import JobList from "./JobList"; // Import JobList component
-import "./App.css";
+import Login from "./components/login";
+import JobList from "./components/JobList"; // Import JobList component
+import "./styles/App.css"; // Import App CSS
 
 function App() {
   const [auth, setAuth] = useState(!!localStorage.getItem("token")); // Check if user is logged in

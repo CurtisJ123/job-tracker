@@ -1,0 +1,122 @@
+.job-columns {
+  display: flex;
+  justify-content: space-around;
+}
+
+.job-column {
+  width: 30%;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease; /* Reduce animation duration */
+}
+
+.job-column:hover {
+  transform: scale(1.02); /* Reduce scale effect */
+}
+
+.job-column.applied {
+  background-color: #778da9; /* Medium blue */
+}
+
+.job-column.interview {
+  background-color: #415a77; /* Dark blue */
+}
+
+.job-column.offer {
+  background-color: #1b263b; /* Navy blue */
+}
+
+.job-column h2 {
+  text-align: center;
+  color: #e0e1dd; /* Light gray */
+}
+
+.job-column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.job-column ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.job-column li {
+  background: #e0e1dd; /* Light gray */
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease; /* Reduce animation duration */
+}
+
+.job-column li:hover {
+  transform: scale(1.01); /* Reduce scale effect */
+}
+
+.job-column li div {
+  display: flex;
+  flex-direction: column;
+}
+
+.job-column button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  background-color: #415a77; /* Dark blue */
+  border: none;
+  color: #e0e1dd; /* Light gray */
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s ease; /* Reduce animation duration */
+}
+
+.job-column button:hover {
+  background-color: #1b263b; /* Navy blue */
+}
+
+.add-job-button {
+  padding: 5px 10px;
+  background-color: #778da9; /* Medium blue */
+  border: none;
+  color: #e0e1dd; /* Light gray */
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s ease; /* Reduce animation duration */
+}
+
+.add-job-button:hover {
+  background-color: #415a77; /* Dark blue */
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.2s ease, transform 0.2s ease; /* Reduce animation duration */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  transition: opacity 0.2s ease; /* Reduce animation duration */
+}
+
+.blur {
+  filter: blur(5px);
+}

@@ -1,0 +1,51 @@
+.job-card {
+  background: #e0e1dd; /* Light gray */
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease; /* Reduce animation duration */
+}
+
+.job-card:hover {
+  transform: scale(1.01); /* Reduce scale effect */
+}
+
+.job-card .job-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.job-card .job-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.job-card .edit-button,
+.job-card .delete-button {
+  padding: 5px 10px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s ease; /* Reduce animation duration */
+}
+
+.job-card .edit-button {
+  background-color: #415a77; /* Dark blue */
+}
+
+.job-card .edit-button:hover {
+  background-color: #1b263b; /* Navy blue */
+}
+
+.job-card .delete-button {
+  background-color: #415a77; /* Red */
+}
+
+.job-card .delete-button:hover {
+  background-color: #1b263b; /* Dark red */
+}
