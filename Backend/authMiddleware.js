@@ -15,7 +15,6 @@ const authMiddleware = (req, res, next) => {
   try {
     // Verify the token using the secret key
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded token:", decoded); // Log decoded token
     // Attach the decoded user information to the request object
     req.user = decoded; // Attach decoded user info to req
     // Call the next middleware function in the stack

@@ -55,10 +55,8 @@ app.post("/jobs", authMiddleware, async (req, res) => {
 // Get all jobs (protected by authMiddleware)
 app.get("/jobs", authMiddleware, async (req, res) => {
   const user_id = req.user.userId; // Get user ID from authMiddleware
-  console.log("User ID in GET /jobs:", user_id); // Log user ID
 
   try {
-    console.log("User ID: ", user_id);
     const result = await pool.query("SELECT * FROM jobs WHERE user_id = $1 ORDER BY created_at DESC", [user_id]);
     res.json(result.rows);
   } catch (err) {
@@ -71,7 +69,8 @@ app.get("/jobs", authMiddleware, async (req, res) => {
 app.put("/jobs/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { title, company, status } = req.body;
-  const user_id = req.user.id; // Get user ID from authMiddleware
+  const user_id = req.user.userId; // Get user ID from authMiddleware
+  console.log(`Updating job with ID: ${id} for user ID: ${user_id}`); // Log job ID and user ID
 
   if (!title || !company || !status) {
     return res.status(400).json({ error: "Please provide title, company, and status" });
@@ -97,7 +96,7 @@ app.put("/jobs/:id", authMiddleware, async (req, res) => {
 // Delete a job (protected by authMiddleware)
 app.delete("/jobs/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
-  const user_id = req.user.id; // Get user ID from authMiddleware
+  const user_id = req.user.userId; // Get user ID from authMiddleware
 
   try {
     const result = await pool.query("DELETE FROM jobs WHERE id=$1 AND user_id=$2 RETURNING *", [id, user_id]);
