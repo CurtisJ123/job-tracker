@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import jwtDecode from "jwt-decode"; // Import jwt-decode library
 import Login from "./login";
 import JobList from "./JobList"; // Import JobList component
 import "./App.css";
@@ -6,10 +7,26 @@ import "./App.css";
 function App() {
   const [auth, setAuth] = useState(!!localStorage.getItem("token")); // Check if user is logged in
 
+  const isTokenExpired = (token) => {
+    try {
+      const { exp } = jwtDecode(token);
+      return Date.now() >= exp * 1000;
+    } catch (e) {
+      return false;
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove JWT token
     setAuth(null); // Update UI to show login form again
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token && isTokenExpired(token)) {
+      handleLogout();
+    }
+  }, []);
 
   return (
     <div className="App">
