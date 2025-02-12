@@ -33,14 +33,17 @@ app.use("/auth", authRoutes); // Use authentication routes
 // Job CRUD operations (protected by authMiddleware)
 app.post("/jobs", authMiddleware, async (req, res) => {
   const { title, company, status } = req.body;
+  const user_id = req.user.userId; // Get user ID from authMiddleware
+  console.log("User ID in POST /jobs:", user_id); // Log user ID
+
   if (!title || !company || !status) {
     return res.status(400).json({ error: "Please provide title, company, and status" });
   }
 
   try {
     const result = await pool.query(
-      "INSERT INTO jobs (title, company, status) VALUES ($1, $2, $3) RETURNING *",
-      [title, company, status]
+      "INSERT INTO jobs (title, company, status, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      [title, company, status, user_id]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -51,8 +54,12 @@ app.post("/jobs", authMiddleware, async (req, res) => {
 
 // Get all jobs (protected by authMiddleware)
 app.get("/jobs", authMiddleware, async (req, res) => {
+  const user_id = req.user.userId; // Get user ID from authMiddleware
+  console.log("User ID in GET /jobs:", user_id); // Log user ID
+
   try {
-    const result = await pool.query("SELECT * FROM jobs ORDER BY created_at DESC");
+    console.log("User ID: ", user_id);
+    const result = await pool.query("SELECT * FROM jobs WHERE user_id = $1 ORDER BY created_at DESC", [user_id]);
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -64,6 +71,7 @@ app.get("/jobs", authMiddleware, async (req, res) => {
 app.put("/jobs/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { title, company, status } = req.body;
+  const user_id = req.user.id; // Get user ID from authMiddleware
 
   if (!title || !company || !status) {
     return res.status(400).json({ error: "Please provide title, company, and status" });
@@ -71,8 +79,8 @@ app.put("/jobs/:id", authMiddleware, async (req, res) => {
 
   try {
     const result = await pool.query(
-      "UPDATE jobs SET title=$1, company=$2, status=$3 WHERE id=$4 RETURNING *",
-      [title, company, status, id]
+      "UPDATE jobs SET title=$1, company=$2, status=$3 WHERE id=$4 AND user_id=$5 RETURNING *",
+      [title, company, status, id, user_id]
     );
 
     if (result.rows.length === 0) {
@@ -89,12 +97,13 @@ app.put("/jobs/:id", authMiddleware, async (req, res) => {
 // Delete a job (protected by authMiddleware)
 app.delete("/jobs/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
+  const user_id = req.user.id; // Get user ID from authMiddleware
 
   try {
-    const result = await pool.query("DELETE FROM jobs WHERE id=$1 RETURNING *", [id]);
+    const result = await pool.query("DELETE FROM jobs WHERE id=$1 AND user_id=$2 RETURNING *", [id, user_id]);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Job not found" });
+      return res.status(404).json({ error: "Job not found or not authorized" });
     }
 
     res.json({ message: "Job deleted successfully" });
