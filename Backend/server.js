@@ -72,15 +72,33 @@ app.put("/jobs/:id", authMiddleware, async (req, res) => {
   const user_id = req.user.userId; // Get user ID from authMiddleware
   console.log(`Updating job with ID: ${id} for user ID: ${user_id}`); // Log job ID and user ID
 
-  if (!title || !company || !status) {
-    return res.status(400).json({ error: "Please provide title, company, and status" });
+  if (!title || !company) {
+    return res.status(400).json({ error: "Please provide title and company" });
   }
 
   try {
-    const result = await pool.query(
-      "UPDATE jobs SET title=$1, company=$2, status=$3 WHERE id=$4 AND user_id=$5 RETURNING *",
-      [title, company, status, id, user_id]
-    );
+    const fields = [];
+    const values = [];
+    let query = "UPDATE jobs SET ";
+
+    if (title) {
+      fields.push(`title=$${fields.length + 1}`);
+      values.push(title);
+    }
+    if (company) {
+      fields.push(`company=$${fields.length + 1}`);
+      values.push(company);
+    }
+    if (status) {
+      fields.push(`status=$${fields.length + 1}`);
+      values.push(status);
+    }
+
+    query += fields.join(", ");
+    query += ` WHERE id=$${fields.length + 1} AND user_id=$${fields.length + 2} RETURNING *`;
+    values.push(id, user_id);
+
+    const result = await pool.query(query, values);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Job not found" });
