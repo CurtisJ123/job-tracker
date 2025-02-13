@@ -1,9 +1,9 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import "../styles/JobCard.css"; // Import JobCard CSS
 
-const JobCard = ({ job, onEdit, onDelete }) => {
+const JobCard = forwardRef(({ job, onEdit, onDelete, style, index, ...props }, ref) => {
   return (
-    <li className="job-card">
+    <li className="job-card" ref={ref} {...props} style={style}>
       <div className="job-details">
         <strong>{job.title}</strong> at {job.company}
       </div>
@@ -13,6 +13,6 @@ const JobCard = ({ job, onEdit, onDelete }) => {
       </div>
     </li>
   );
-};
+});
 
 export default JobCard;

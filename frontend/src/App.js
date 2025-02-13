@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import jwtDecode from "jwt-decode"; // Import jwt-decode library
+import { jwtDecode } from "jwt-decode"; // Import jwt-decode library
 import Login from "./components/login";
 import JobList from "./components/JobList"; // Import JobList component
 import "./styles/App.css"; // Import App CSS

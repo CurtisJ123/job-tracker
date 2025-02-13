@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import JobCard from "./JobCard"; // Import JobCard component
 import JobAdd from "./JobAdd"; // Import JobAdd component
 import JobEdit from "./JobEdit"; // Import JobEdit component
@@ -41,44 +42,106 @@ const JobList = ({ backendUrl }) => {
     setEditingJob(job); // Store the job being edited
   };
 
+  const onDragEnd = (result) => {
+    const { destination, source, draggableId } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    const job = jobs.find((job) => job.id.toString() === draggableId);
+    if (job) {
+      job.status = destination.droppableId;
+      axios
+        .put(`${backendUrl}/jobs/${draggableId}`, job, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        })
+        .then((response) => {
+          setJobs((prevJobs) => prevJobs.map((j) => (j.id.toString() === draggableId ? response.data : j)));
+        })
+        .catch((error) => console.error("Error updating job:", error));
+    }
+  };
+
+  const getItemStyle = (isDragging, draggableStyle) => ({
+    // some basic styles to make the items look a bit nicer
+    userSelect: "none",
+    padding: 16,
+    margin: `0 0 8px 0`,
+    borderRadius: 5,
+    background: isDragging ? "#e0e1dd" : "#f4f4f4",
+    boxShadow: isDragging ? "0 0 10px rgba(0, 0, 0, 0.2)" : "0 0 5px rgba(0, 0, 0, 0.1)",
+    // styles we need to apply on draggables
+    ...draggableStyle,
+    // fix for dragging issue
+    transform: isDragging ? draggableStyle.transform : undefined,
+  });
+
   return (
     <>
       <div className={editingJob || addingJob ? "blur" : ""}>
-        <div className="job-columns">
-          {["applied", "interview", "offer"].map((status) => (
-            <div key={status} className={`job-column ${status}`}>
-              <div className="job-column-header">
-                <h2>{status.charAt(0).toUpperCase() + status.slice(1)}</h2>
-                {status === "applied" && (
-                  <button onClick={() => setAddingJob(true)} className="add-job-button">
-                    Add Job
-                  </button>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="job-columns">
+            {["applied", "interview", "offer"].map((status) => (
+              <Droppable droppableId={status} key={status}>
+                {(provided) => (
+                  <div
+                    className={`job-column ${status}`}
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                  >
+                    <div className="job-column-header">
+                      <h2>{status.charAt(0).toUpperCase() + status.slice(1)}</h2>
+                      {status === "applied" && (
+                        <button onClick={() => setAddingJob(true)} className="add-job-button">
+                          Add Job
+                        </button>
+                      )}
+                    </div>
+                    <ul>
+                      {jobs
+                        .filter((job) => job.status === status)
+                        .map((job, index) => (
+                          <Draggable draggableId={job.id.toString()} index={index} key={job.id}>
+                            {(provided, snapshot) => (
+                              <JobCard
+                                job={job}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                style={getItemStyle(
+                                  snapshot.isDragging,
+                                  provided.draggableProps.style
+                                )}
+                              />
+                            )}
+                          </Draggable>
+                        ))}
+                      {provided.placeholder}
+                    </ul>
+                  </div>
                 )}
-              </div>
-              <ul>
-                {
-                  jobs.filter((job) => job.status === status).map((job) => (
-                    <JobCard key={job.id} job={job} onEdit={handleEdit} onDelete={handleDelete} />
-                  ))
-                }
-              </ul>
-            </div>
-          ))}
-        </div>
+              </Droppable>
+            ))}
+          </div>
+        </DragDropContext>
       </div>
 
       {addingJob && (
-        <>
-          <div className="modal-overlay" onClick={() => setAddingJob(false)}></div>
-          <JobAdd backendUrl={backendUrl} setJobs={setJobs} setAddingJob={setAddingJob} />
-        </>
+        <JobAdd backendUrl={backendUrl} setJobs={setJobs} setAddingJob={setAddingJob} />
       )}
 
       {editingJob && (
-        <>
-          <div className="modal-overlay" onClick={() => setEditingJob(null)}></div>
-          <JobEdit backendUrl={backendUrl} job={editingJob} setJobs={setJobs} setEditingJob={setEditingJob} />
-        </>
+        <JobEdit backendUrl={backendUrl} job={editingJob} setJobs={setJobs} setEditingJob={setEditingJob} />
       )}
     </>
   );
