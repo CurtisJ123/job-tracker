@@ -49,16 +49,17 @@ const JobList = ({ backendUrl }) => {
       return;
     }
 
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    ) {
-      return;
-    }
-
     const job = jobs.find((job) => job.id.toString() === draggableId);
     if (job) {
-      job.status = destination.droppableId;
+      if (destination.droppableId === "trashcan") {
+        const confirmRejection = window.confirm("Are you sure you want to reject this job?");
+        if (!confirmRejection) {
+          return;
+        }
+        job.status = "rejected";
+      } else {
+        job.status = destination.droppableId;
+      }
       axios
         .put(`${backendUrl}/jobs/${draggableId}`, job, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -78,11 +79,21 @@ const JobList = ({ backendUrl }) => {
     borderRadius: 5,
     background: isDragging ? "#e0e1dd" : "#f4f4f4",
     boxShadow: isDragging ? "0 0 10px rgba(0, 0, 0, 0.2)" : "0 0 5px rgba(0, 0, 0, 0.1)",
-    // styles we need to apply on draggables
     ...draggableStyle,
-    // fix for dragging issue
     transform: isDragging ? draggableStyle.transform : undefined,
   });
+
+  const handleExport = () => {
+    const dataStr = JSON.stringify(jobs, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "jobs.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <>
@@ -132,9 +143,23 @@ const JobList = ({ backendUrl }) => {
                 )}
               </Droppable>
             ))}
+            <Droppable droppableId="trashcan">
+              {(provided) => (
+                <div
+                  className="trashcan"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  <span>🗑️ Rejected</span>
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
           </div>
         </DragDropContext>
       </div>
+
+      <button onClick={handleExport} className="export-button">Export Jobs</button>
 
       {addingJob && (
         <JobAdd backendUrl={backendUrl} setJobs={setJobs} setAddingJob={setAddingJob} />

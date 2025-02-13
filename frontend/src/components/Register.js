@@ -1,35 +1,43 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "../styles/Login.css"; // Import Login CSS
+import "../styles/Login.css"; // Reuse Login CSS for Register
 
-const Login = ({ setAuth, setShowRegister, setShowForgotPassword }) => {
+const Register = ({ setShowRegister }) => {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
     
     try {
-      const res = await axios.post(`${backendUrl}/auth/login`, {
+      await axios.post(`${backendUrl}/auth/register`, {
+        username,
         email,
         password,
       });
-      localStorage.setItem("token", res.data.token);
-      setAuth(true); // Update auth state in the parent component
+      setShowRegister(false); // Navigate back to login form
     } catch (err) {
-      setError("Invalid email or password");
+      setError("Error registering user");
     }
   };
 
   return (
     <div className="login-page">
-      <form className="login-form" onSubmit={handleLogin}>
-        <h2>Login</h2>
+      <form className="login-form" onSubmit={handleRegister}>
+        <h2>Register</h2>
         {error && <p className="error">{error}</p>}
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
         <input
           type="email"
           placeholder="Email"
@@ -44,12 +52,11 @@ const Login = ({ setAuth, setShowRegister, setShowForgotPassword }) => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Login</button>
-        <button type="button" className="register-button" onClick={() => setShowRegister(true)}>Register</button>
-        <button type="button" className="forgot-password-button" onClick={() => setShowForgotPassword(true)}>Forgot Password</button>
+        <button type="submit">Register</button>
+        <button type="button" onClick={() => setShowRegister(false)}>Back to Login</button>
       </form>
     </div>
   );
 };
 
-export default Login;
+export default Register;

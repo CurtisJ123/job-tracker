@@ -17,6 +17,7 @@
     "express-validator": "^7.2.1",
     "git": "^0.1.5",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.10.0",
     "pg": "^8.13.1"
   }
 }

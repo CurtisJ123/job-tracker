@@ -44,12 +44,6 @@ const JobAdd = ({ backendUrl, setJobs, setAddingJob }) => {
             onChange={handleChange}
             required
           />
-          <select name="status" value={newJob.status} onChange={handleChange}>
-            <option value="applied">Applied</option>
-            <option value="interview">Interview</option>
-            <option value="offer">Offer</option>
-            <option value="rejected">Rejected</option>
-          </select>
           <button type="submit">Add Job</button>
           <button type="button" onClick={() => setAddingJob(false)}>Cancel</button>
         </form>
