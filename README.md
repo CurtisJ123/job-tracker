@@ -4,7 +4,7 @@ Job Tracker is a web application that helps users manage their job applications.
 
 ## Live Demo
 
-Check out the live demo [https://job-tracker-blush.vercel.app/](#).
+Check out the live demo [https://job-tracker-blush.vercel.app/](https://job-tracker-blush.vercel.app/).
 
 ## Test Account
 
